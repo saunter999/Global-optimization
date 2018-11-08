@@ -14,8 +14,8 @@ class PSO:
 	    self.c1=2.0
 	    self.c2=2.0
 	    self.pN=pN
-	    self.lb=-9.
-	    self.ub=9.
+	    self.lb=-12.
+	    self.ub=12.
 	    self.dim=dim
 	    self.max_iter=max_iter
 	    self.X=zeros((self.pN,self.dim))     ## particle's positions and velocity 
@@ -24,14 +24,23 @@ class PSO:
 	    self.gbest=zeros(self.dim)
 	    self.p_fit=zeros(self.pN)            ## particle's personal best fit and the swarm's global best fit
 	    self.g_fit=inf
-	
+
+	def print_info(self):
+	    print "w=",self.w
+	    print "pN=",self.pN
+	    print "dim=",self.dim
+	    print "max_iter=",self.max_iter
+	    print "lb=",self.lb
+	    print "ub=",self.ub
+
         #-----------target function---------#
 	def function(self,X): ##X is local
 #	    return X*sin(X)+X*cos(2*X)  
+#	    return cos(14.5 * X - 0.3) + (X + 0.2) * X
 #	    return X**2-4*X+3  
-#	    return (X**2-5*X)*sin(X) 
+ 	    return (X**2-5*X)*sin(X) 
 #	    return LA.norm(X)**2
-	    return (X[0]**2+X[1]-11)**2+(X[0]+X[1]**2-7)**2
+#	    return (X[0]**2+X[1]-11)**2+(X[0]+X[1]**2-7)**2
 
         #-----------PSO objects initialization---------#
 	def init_Population(self):
@@ -85,16 +94,28 @@ class PSO:
 
 
 if __name__=="__main__":
-	my_pso=PSO(pN=20,dim=2,max_iter=100)
+	my_pso=PSO(pN=20,dim=1,max_iter=100)
+	my_pso.print_info()
 	my_pso.init_Population()
 	fitness,gbestls=my_pso.iterator()
- 	print fitness
-	figure(0)
+	
+	print "global minimum x=",gbestls[-1]
+	print "global minimum y=",fitness[-1]
+ 	#print fitness
+
+	figure(1)
 	title('Global_best y vs iteration')
 	plot(range(my_pso.max_iter),fitness,'o-')
 	for i in range(my_pso.dim):
-	    figure(i+1)
+	    figure(i+2)
 	    title('Global_best x_'+str(i)+' vs iteration')
 	    plot(range(my_pso.max_iter),gbestls[:,i],'o-')
 		
+	figure(0)
+	xs=linspace(my_pso.lb,my_pso.ub,200)
+	ys=[my_pso.function(x) for x in xs]
+	plot(xs,ys)
+	if my_pso.dim==1:
+    	   axvline(x=gbestls[-1],c='r')
+	   savefig('PSO_globalmin.png')
 	show()
